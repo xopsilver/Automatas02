@@ -116,8 +116,276 @@ static QList <int>tokenEdo;
 static QList<std::string> tokenValor;
 
 static QList<QVector<QString>> bloques;
+static QList<QString> bloque;
+static QList<int> posicionesCiclos;
+//optimizacion
+//HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
 
 
+ static QVector<QString> ExpRedundantes(QVector<QString> bloque) {
+   //  ArrayList<String[]> listadoPartes = new ArrayList<>();
+     QList<QVector<QString>> listadoPartes;
+     for (int i = 0; i < bloque.size(); i++) {
+         QString linea = bloque[i];
+         QVector<QString> partes(3);
+                  //QString[] partes = new QString[3];
+         int contIgual = -1;
+         for (int j = 0; j < linea.length(); j++) {
+             if (linea.at(j) == '=' || linea.at(j) == '<' || linea.at(j) == '>') {
+                 partes[2] = linea.at(j);
+                 contIgual = j;
+                 break;
+             }
+         }
+         if (contIgual != -1) {
+             partes[0] = linea.left(contIgual);
+             partes[0] = partes[0].replace(" ", "");
+             if (linea.at(linea.length() - 1) == ';') {
+                 partes[1] = linea.right(contIgual + 1);
+                 partes[1] = partes[1].replace(" ", "");
+             } else {
+                 partes[1] = linea.right(contIgual + 1);
+                 partes[1] = partes[1].replace(" ", "");
+
+             }
+             listadoPartes.append(partes);
+           //  System.out.println("partes[" + partes[0] + "][" + partes[1] + "][" + partes[2] + "]");
+         }
+     }
+     // aqui debe de reemplzar las expresiones iguales que encuentre
+
+     for (int i = 0; i < listadoPartes.size(); i++) {
+         for (int j = i + 1; j < listadoPartes.size(); j++) {
+
+             if (listadoPartes.at(j)[1] == listadoPartes.at(i)[1]) {
+                 listadoPartes.at(j).at(1);
+                 listadoPartes.at(j)[1] = listadoPartes.at(i)[0];
+             }
+         }
+     }
+     QVector<QString> reconstruido(listadoPartes.size());
+    // QString[] reconstruido = new QString[listadoPartes.size()];
+     for (int i = 0; i < listadoPartes.size(); i++) {
+         reconstruido[i] = listadoPartes.at(i)[0] + listadoPartes.at(i)[2] + listadoPartes.at(i)[1];
+        // System.out.println(reconstruido[i]);
+
+     }
+
+     return reconstruido;
+ }
+
+ // como se declara aquiiiiii ???
+
+ QVector<QString> simpAlgebraica(QVector <QString> bloque ){
+ //QString[] simpAlgebraica(QString[] bloque) {
+    // System.out.println("Simplificacion Algebraica");
+     //ArrayList<String[]> listadoPartes = new ArrayList<>();
+     QList<QVector<QString>> listadoPartes;
+     for (int i = 0; i < bloque.size(); i++) {
+         QString linea = bloque[i];
+       //  QVector(3,QString) partes = new QVector[3];
+         QVector<QString> partes(QVector<QString>(3));
+         int contIgual = -1;
+         for (int j = 0; j < linea.length(); j++) {
+             if (linea.at(j) == '=' || linea.at(j) == '<' || linea.at(j) == '>') {
+                 partes[2] = linea.at(j);
+                 contIgual = j;
+                 break;
+             }
+         }
+         if (contIgual != -1) {
+             partes[0] = linea.left(contIgual);
+             partes[0] = partes[0].replace(" ", "");
+             if (linea.at(linea.length() - 1) == ';') {
+                 partes[1] = linea.right(contIgual + 1);
+                 partes[1] = partes[1].replace(" ", "");
+             } else {
+                 partes[1] = linea.right(contIgual + 1);
+                 partes[1] = partes[1].replace(" ", "");
+
+             }
+             listadoPartes.append(partes);
+            // System.out.println("partes[" + partes[0] + "][" + partes[1] + "][" + partes[2] + "]");
+         }
+     }
+     // aqui se debe de simplicar lo algebraico
+
+     for (int i = 0; i < listadoPartes.size(); i++) {
+        // System.out.println("Valores del listad en "+i+" = "+listadoPartes.get(i)[0]+","+listadoPartes.get(i)[1]+","+listadoPartes.get(i)[2]);
+         QString aux = listadoPartes.at(i)[1];
+       //  System.out.println(aux);
+         QString lineaOpt="";
+         QChar operador = 0 ;
+         bool isEqual = true;
+         int cont = 0;
+         for (int j = 0; j < aux.length(); j++) {
+             if (aux.at(j) == '+' || aux.at(j) == '*' ) {
+
+                // System.out.println("Oeprador = "+operador);
+                 cont++;
+                 if (operador == 0) {
+                     operador = aux.at(j);
+                 } else {
+                    // System.out.println(operador+" = "+aux.at(j)+" = "+(operador==aux.at(j)));
+                     if (operador!=aux.at(j)) {
+                         isEqual = false;
+                         break;
+                     }
+                 }
+             }
+         }
+       //  System.out.println(aux+" = "+isEqual);
+         QVector<QString> operandos(cont+1);
+        // QString[] operandos = new String[cont + 1];
+         QString operando = "";
+         if (isEqual && cont > 0) {
+             //System.out.println(aux);
+            // System.out.println("Todos los operadores son iguales");
+             int contOperandos = 0;
+             for (int j = 0; j < aux.length(); j++) {
+               //  System.out.println(aux.at(j));
+                 if(aux.at(j)=='+' || aux.at(j)== '*')
+                 {
+                     operandos[contOperandos] = operando;
+                   //  System.out.println("El operando es: "+operando);
+                     operando = "";
+                     contOperandos++;
+
+                 }else
+                 {
+                    // System.out.println("Se concatena");
+                     operando += aux.at(j);
+                 }
+             }
+             operandos[contOperandos] = operando;
+            // System.out.println("vector");
+             float suma = 0;
+             for (int j = 0; j < operandos.size(); j++) {
+               //  System.out.print("["+operandos[j]+"]");
+               //  System.out.println("");
+                 try{
+                     int valor = operandos[j].toInt();
+                     if(operador=='+'){
+                         suma+=valor;
+                         operandos[j]= "";
+                     }
+                     else{
+                         suma*=valor;
+                          operandos[j]= "";
+                     }
+                 }catch(exception e)
+                 {
+                     try{
+                         float valor = operandos[j].toFloat();
+                     if(operador=='+')
+                     {
+                         suma+=valor;
+                          operandos[j]= "";
+                     }
+                     else
+                     {
+                         suma*=valor;
+                          operandos[j]= "";
+                     }
+                     }catch(exception ee)
+                     {
+                         //System.out.println("El operador es una variables");
+
+                     }
+                 }
+             }
+             lineaOpt = "";
+             //System.out.println("Aqui imprimims todos los operandos jeje :v");
+             for (int j = 0; j < operandos.size(); j++) {
+                // System.out.print("["+operandos[j]+"]");
+               //  System.out.println("");
+                 if(operandos[j] != "")
+                 lineaOpt+=operandos[j]+""+operador;
+             }
+             if(suma!=0){
+             lineaOpt+=suma;
+             }else
+                 lineaOpt = lineaOpt.left(lineaOpt.length()-1);
+         }else if(isEqual && cont<=0)
+         {
+             lineaOpt = aux;
+         }
+
+         listadoPartes.at(i)[1] = lineaOpt;
+     }
+    // System.out.println("Aqui reconstruye");
+     QVector<QString> bloqueOpt(listadoPartes.size());
+     //QString [] bloqueOpt = new QString[listadoPartes.size()];
+     for (int i = 0; i < listadoPartes.size(); i++) {
+       //  System.out.println(listadoPartes.get(i)[0]+listadoPartes.get(i)[2]+listadoPartes.get(i)[1]);
+         bloqueOpt[i]= listadoPartes.at(i)[0]+listadoPartes.at(i)[2]+listadoPartes.at(i)[1];
+     }
+     return bloqueOpt;
+ }
+
+ void optimizar() {
+      /* lista triste:
+           - Simplificacion algebraica
+           - Expresiones redundantes
+       */
+      for (int i = 0; i < bloques.size(); i++) {
+
+          bloques.replace(i, ExpRedundantes(bloques.at(i)));
+          bloques.replace(i, simpAlgebraica(bloques.at(i)));
+      }
+  }
+ void optCiclos()
+     {
+          QVector<QString> bloqueTamaño;
+          //System.out.println("Tamaño posiciones: "+posicionesCiclos.size());
+           for(int i=0;i<posicionesCiclos.size();i++)
+           {
+                  bloqueTamaño = bloques.at(posicionesCiclos.at(i)-1);
+                  for (int j = 0; j < bloqueTamaño.size(); j++) {
+                     // System.out.println("Bloque Tamaño ["+bloqueTamaño[j]);
+               }
+                  int inicio = 0;
+                  int finals = 0;
+               for(QString lineaa:bloqueTamaño){
+                     lineaa=lineaa.replace(" ", "");
+                    // System.out.println("Linea: "+lineaa);
+                   for (int j = 0; j < lineaa.length(); j++) {
+
+                       if(lineaa.at(j) == '=')
+                       {
+
+
+                           // System.out.println(lineaa.substring(j+1, lineaa.length()));
+                           inicio = lineaa.right(j+1).toInt();
+                       }
+                       if(lineaa.at(j)=='<' || lineaa.at(j)=='>')
+                       {
+
+
+                           // System.out.println(lineaa.substring(j+1, lineaa.length()));
+                           finals = lineaa.right(j+1).toInt();
+                       }
+                   }
+               }
+              // System.out.println("inicio = "+inicio);
+               //System.out.println("Final = "+finals);
+               int tamaño = (finals-inicio) * bloques.at(posicionesCiclos.at(i)).size();
+               int oper = finals-inicio;
+               int contador = 0;
+             //  System.out.println("Tamaño"+tamaño);
+               QVector<QString> bloqueDesenvuelto (tamaño);
+               for (int j = 0; j < oper; j++) {
+                  QVector<QString> bloqueRepetir = bloques.at(posicionesCiclos.at(i));
+                   for (int k = 0; k < bloqueRepetir.size(); k++) {
+                     //  System.out.println(contador);
+                       bloqueDesenvuelto[contador] = bloqueRepetir[k];
+                       contador++;
+                   }
+               }
+               bloques.replace(posicionesCiclos.at(i), bloqueDesenvuelto);
+               bloques.removeAt(posicionesCiclos.at(i)-1);
+           }
+     }
 //semantico
 
 void MainWindow::exe(){
@@ -2726,6 +2994,161 @@ void MainWindow::on_pushButton_3_clicked()
 
 
     archi=0;
+
+          QString texto = ui->txtTexto2->toPlainText();
+          texto += "\n";
+          int contador = 0;
+          int control = 0;
+
+          for (int i = 0; i < texto.length(); i++) {
+              if (texto.at(i) == '\n') {
+                  contador++;
+              }
+
+          }
+          QString lineas[contador];
+          QString linea = "";
+          for (int i = 0; i < texto.length(); i++) {
+              if (texto.at(i) == '\n') {
+                  lineas[control] = linea;
+                  linea = "";
+                  control++;
+              } else {
+                  linea += texto.at(i);
+              }
+
+          }
+          for (int i = 0; i < lineas->size(); i++) {
+
+              if (lineas[i].contains("for")&& lineas[i] != "endfor;") {
+                  if (bloque.size() > 0) {
+                      //jTextArea2.append("Bloquesito \n");
+                    QVector< QString> lin (bloque.size());
+                      for (int j = 0; j < bloque.size(); j++) {
+                          lin[j] = bloque.at(j);
+                          //jTextArea2.append(bloque.get(j) + "\n");
+                      }
+
+                      bloques.append(lin);
+                      bloque.clear();
+                  }
+                  QString line = lineas[i];
+                  bool guardar = false;
+                  QString lineaAux = "";
+                  for (int j = 0; j < line.length(); j++) {
+                      if (line.at(j) == '(') {
+                          guardar = true;
+                      } else {
+                          if (line.at(j) == ':') {
+                              bloque.append(lineaAux);
+                              lineaAux = "";
+                          } else if (line.at(j) == ')') {
+                              guardar = false;
+                              bloque.append(lineaAux);
+                             // jTextArea2.append("Bloquesito \n");
+                              QVector<QString> lin (bloque.size());
+                              for (int k = 0; k < bloque.size(); k++) {
+                                  lin[k] = bloque.at(k);
+                                  //jTextArea2.append(bloque.get(k) + "\n");
+                              }
+                              bloques.append(lin);
+                              bloque.clear();
+
+                          } else {
+                              if (guardar) {
+                                  lineaAux += line.at(j);
+                              }
+                          }
+
+                      }
+                  }
+              } else if (lineas[i].contains("if") || lineas[i].contains("while") || lineas[i].contains("until")) {
+                  if (bloque.size() > 0) {
+                      //jTextArea2.append("Bloquesito \n");
+                      QVector<QString> lin (bloque.size());
+                      for (int j = 0; j < bloque.size(); j++) {
+                          lin[j] = bloque.at(j);
+                         // jTextArea2.append(bloque.get(j) + "\n");
+                      }
+                      bloques.append(lin);
+                      bloque.clear();
+                  }
+                  QString line = lineas[i];
+                  bool guardar = false;
+                  QString lineaAux = "";
+                  for (int j = 0; j < line.length(); j++) {
+                      if (line.at(j) == '(') {
+                          guardar = true;
+                      } else {
+                          if (line.at(j) == ')') {
+                              bloque.append(line);
+                            //  jTextArea2.append("Bloquesito \n");
+                              QVector<QString> lin (bloque.size());
+                              for (int k = 0; k < bloque.size(); k++) {
+                                  lin[k] = bloque.at(k);
+                                  //jTextArea2.append(bloque.get(k) + "\n");
+                              }
+                              bloques.append(lin);
+                              bloque.clear();
+
+                          } else {
+                              lineaAux += line.at(j);
+                          }
+
+                      }
+                  }
+              } else if(lineas[i].contains("endfor;"))
+              {
+                   if (bloque.size() > 0) {
+                      //jTextArea2.append("Bloquesito \n");
+                       QVector<QString> lin (bloque.size());
+                      for (int j = 0; j < bloque.size(); j++) {
+                          lin[j] = bloque.at(j);
+                          //jTextArea2.append(bloque.get(j) + "\n");
+                      }
+                      bloques.append(lin);
+                      posicionesCiclos.append(bloques.size()-1);
+                      bloque.clear();
+                  }
+              }else if (lineas[i].contains("class")
+                      || lineas[i].contains("begin")
+                      || lineas[i].contains("end")
+                      || lineas[i].contains("else")
+                      || lineas[i].contains("elseIf")
+                      || lineas[i].contains("endif")
+                      || lineas[i].contains("repeat")
+
+                      || lineas[i].contains("endwhile")
+                      || lineas[i].contains("function")
+                      || lineas[i].contains("endFunction")) {
+                  if (bloque.size() > 0) {
+                     // jTextArea2.append("Bloquesito \n");
+                      QVector<QString> lin (bloque.size());
+                      for (int j = 0; j < bloque.size(); j++) {
+                          lin[j] = bloque.at(j);
+                          //jTextArea2.append(bloque.get(j) + "\n");
+                      }
+                      bloques.append(lin);
+                      bloque.clear();
+                  }
+
+              } else {
+                  bloque.append(lineas[i]);
+              }
+              //holi
+          }
+         // System.out.println("Antes de optimizar tamaño: "+posicionesCiclos.size());
+          optimizar();
+          optCiclos();
+
+          for(QVector<QString> bloque:bloques)
+          {
+              for(QString linea:bloque)
+              {
+                  ui->txtOpti->appendPlainText(linea);
+              }
+          }
+
 }
 
 
@@ -2736,218 +3159,4 @@ void MainWindow::on_pushButton_clicked()
     qDebug() << pilaTiposid.size();
 }
 
-//HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
 
-
- static QVector<QString> ExpRedundantes(QVector<QString> bloque) {
-   //  ArrayList<String[]> listadoPartes = new ArrayList<>();
-     QList<QVector<QString>> listadoPartes;
-     for (int i = 0; i < bloque.size(); i++) {
-         QString linea = bloque[i];
-         QVector<QString> partes(3);
-                  //QString[] partes = new QString[3];
-         int contIgual = -1;
-         for (int j = 0; j < linea.length(); j++) {
-             if (linea.at(j) == '=' || linea.at(j) == '<' || linea.at(j) == '>') {
-                 partes[2] = linea.at(j);
-                 contIgual = j;
-                 break;
-             }
-         }
-         if (contIgual != -1) {
-             partes[0] = linea.left(contIgual);
-             partes[0] = partes[0].replace(" ", "");
-             if (linea.at(linea.length() - 1) == ';') {
-                 partes[1] = linea.right(contIgual + 1);
-                 partes[1] = partes[1].replace(" ", "");
-             } else {
-                 partes[1] = linea.right(contIgual + 1);
-                 partes[1] = partes[1].replace(" ", "");
-
-             }
-             listadoPartes.append(partes);
-           //  System.out.println("partes[" + partes[0] + "][" + partes[1] + "][" + partes[2] + "]");
-         }
-     }
-     // aqui debe de reemplzar las expresiones iguales que encuentre
-
-     for (int i = 0; i < listadoPartes.size(); i++) {
-         for (int j = i + 1; j < listadoPartes.size(); j++) {
-
-             if (listadoPartes.at(j)[1] == listadoPartes.at(i)[1]) {
-                 listadoPartes.at(j).at(1);
-                 listadoPartes.at(j)[1] = listadoPartes.at(i)[0];
-             }
-         }
-     }
-     QVector<QString> reconstruido(listadoPartes.size());
-    // QString[] reconstruido = new QString[listadoPartes.size()];
-     for (int i = 0; i < listadoPartes.size(); i++) {
-         reconstruido[i] = listadoPartes.at(i)[0] + listadoPartes.at(i)[2] + listadoPartes.at(i)[1];
-        // System.out.println(reconstruido[i]);
-
-     }
-
-     return reconstruido;
- }
- 
- // como se declara aquiiiiii ???
- 
- QVector<QString> simpAlgebraica(QVector <QString> bloque ){
- //QString[] simpAlgebraica(QString[] bloque) {
-    // System.out.println("Simplificacion Algebraica");
-     //ArrayList<String[]> listadoPartes = new ArrayList<>();
-     QList<QVector<QString>> listadoPartes;
-     for (int i = 0; i < bloque.size(); i++) {
-         QString linea = bloque[i];
-       //  QVector(3,QString) partes = new QVector[3];
-         QVector<QString> partes(QVector<QString>(3));
-         int contIgual = -1;
-         for (int j = 0; j < linea.length(); j++) {
-             if (linea.at(j) == '=' || linea.at(j) == '<' || linea.at(j) == '>') {
-                 partes[2] = linea.at(j);
-                 contIgual = j;
-                 break;
-             }
-         }
-         if (contIgual != -1) {
-             partes[0] = linea.left(contIgual);
-             partes[0] = partes[0].replace(" ", "");
-             if (linea.at(linea.length() - 1) == ';') {
-                 partes[1] = linea.right(contIgual + 1);
-                 partes[1] = partes[1].replace(" ", "");
-             } else {
-                 partes[1] = linea.right(contIgual + 1);
-                 partes[1] = partes[1].replace(" ", "");
-
-             }
-             listadoPartes.append(partes);
-            // System.out.println("partes[" + partes[0] + "][" + partes[1] + "][" + partes[2] + "]");
-         }
-     }
-     // aqui se debe de simplicar lo algebraico
-
-     for (int i = 0; i < listadoPartes.size(); i++) {
-        // System.out.println("Valores del listad en "+i+" = "+listadoPartes.get(i)[0]+","+listadoPartes.get(i)[1]+","+listadoPartes.get(i)[2]);
-         QString aux = listadoPartes.at(i)[1];
-       //  System.out.println(aux);
-         QString lineaOpt="";
-         QChar operador = 0 ;
-         bool isEqual = true;
-         int cont = 0;
-         for (int j = 0; j < aux.length(); j++) {
-             if (aux.at(j) == '+' || aux.at(j) == '*' ) {
-                 
-                // System.out.println("Oeprador = "+operador);
-                 cont++;
-                 if (operador == 0) {
-                     operador = aux.at(j);
-                 } else {
-                    // System.out.println(operador+" = "+aux.at(j)+" = "+(operador==aux.at(j)));
-                     if (operador!=aux.at(j)) {
-                         isEqual = false;
-                         break;
-                     }
-                 }
-             }
-         }
-       //  System.out.println(aux+" = "+isEqual);
-         QVector<QString> operandos(cont+1);
-        // QString[] operandos = new String[cont + 1];
-         QString operando = "";
-         if (isEqual && cont > 0) {
-             //System.out.println(aux);
-            // System.out.println("Todos los operadores son iguales");
-             int contOperandos = 0;
-             for (int j = 0; j < aux.length(); j++) {
-               //  System.out.println(aux.at(j));
-                 if(aux.at(j)=='+' || aux.at(j)== '*')
-                 {
-                     operandos[contOperandos] = operando;
-                   //  System.out.println("El operando es: "+operando);
-                     operando = "";
-                     contOperandos++;
-                     
-                 }else
-                 {
-                    // System.out.println("Se concatena");
-                     operando += aux.at(j);
-                 }
-             }
-             operandos[contOperandos] = operando;
-            // System.out.println("vector");
-             float suma = 0;
-             for (int j = 0; j < operandos.size(); j++) {
-               //  System.out.print("["+operandos[j]+"]");
-               //  System.out.println("");
-                 try{
-                     int valor = operandos[j].toInt();
-                     if(operador=='+'){
-                         suma+=valor;
-                         operandos[j]= "";
-                     }
-                     else{
-                         suma*=valor;
-                          operandos[j]= "";
-                     }
-                 }catch(exception e)
-                 {
-                     try{
-                         float valor = operandos[j].toFloat();
-                     if(operador=='+')
-                     {
-                         suma+=valor;
-                          operandos[j]= "";
-                     }
-                     else
-                     {
-                         suma*=valor;
-                          operandos[j]= "";
-                     }
-                     }catch(exception ee)
-                     {
-                         //System.out.println("El operador es una variables");
-                         
-                     }
-                 }
-             }
-             lineaOpt = "";
-             //System.out.println("Aqui imprimims todos los operandos jeje :v");
-             for (int j = 0; j < operandos.size(); j++) {
-                // System.out.print("["+operandos[j]+"]");
-               //  System.out.println("");
-                 if(operandos[j] != "")
-                 lineaOpt+=operandos[j]+""+operador;
-             }
-             if(suma!=0){
-             lineaOpt+=suma;
-             }else
-                 lineaOpt = lineaOpt.left(lineaOpt.length()-1);
-         }else if(isEqual && cont<=0)
-         {
-             lineaOpt = aux;
-         }
-             
-         listadoPartes.at(i)[1] = lineaOpt;
-     }
-    // System.out.println("Aqui reconstruye");
-     QVector<QString> bloqueOpt(listadoPartes.size());
-     //QString [] bloqueOpt = new QString[listadoPartes.size()]; 
-     for (int i = 0; i < listadoPartes.size(); i++) {
-       //  System.out.println(listadoPartes.get(i)[0]+listadoPartes.get(i)[2]+listadoPartes.get(i)[1]);
-         bloqueOpt[i]= listadoPartes.at(i)[0]+listadoPartes.at(i)[2]+listadoPartes.at(i)[1];
-     }
-     return bloqueOpt;
- }
-
- void optimizar() {
-      /* lista triste:
-           - Simplificacion algebraica
-           - Expresiones redundantes
-       */
-      for (int i = 0; i < bloques.size(); i++) {
-
-          bloques.replace(i, ExpRedundantes(bloques.at(i)));
-          bloques.replace(i, simpAlgebraica(bloques.at(i)));
-      }
-  }

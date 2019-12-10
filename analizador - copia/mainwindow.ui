@@ -345,9 +345,9 @@ text-decoration: underline;</string>
    <widget class="QPlainTextEdit" name="txtPilas">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>520</y>
-      <width>821</width>
+      <x>30</x>
+      <y>530</y>
+      <width>691</width>
       <height>171</height>
      </rect>
     </property>
@@ -360,8 +360,8 @@ border-color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>480</y>
+      <x>40</x>
+      <y>490</y>
       <width>221</width>
       <height>21</height>
      </rect>
@@ -417,6 +417,40 @@ color:rgb(85, 0, 127);</string>
       <string>Res</string>
      </property>
     </column>
+   </widget>
+   <widget class="QPlainTextEdit" name="txtOpti">
+    <property name="geometry">
+     <rect>
+      <x>850</x>
+      <y>520</y>
+      <width>691</width>
+      <height>171</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(203, 190, 255);
+color:rgb(85, 0, 127);
+border-color: rgb(255, 255, 255);</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>850</x>
+      <y>480</y>
+      <width>281</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 11pt &quot;Century Gothic&quot;;
+color: rgb(85, 255, 255);
+
+text-decoration: underline;</string>
+    </property>
+    <property name="text">
+     <string>Impresion Bloques Optimizados</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
